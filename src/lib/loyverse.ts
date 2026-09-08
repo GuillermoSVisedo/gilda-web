@@ -4,10 +4,24 @@ const LOYVERSE_API_BASE = "https://api.loyverse.com/v1.0";
 // informativo (fase 1, sin checkout), no hace falta que sea al segundo.
 const REVALIDATE_SECONDS = 300;
 
+// Si Loyverse no responde en este tiempo, se da por caída (evita que una
+// página se quede colgada esperando indefinidamente).
+const REQUEST_TIMEOUT_MS = 8000;
+
+// Error específico para fallos al hablar con Loyverse (caída, timeout, token
+// inválido...), para poder distinguirlos de un bug en el propio código —
+// ver error.tsx en src/app/coleccion/[slug]/.
+export class LoyverseApiError extends Error {
+  constructor(message: string, options?: { cause?: unknown }) {
+    super(message, options);
+    this.name = "LoyverseApiError";
+  }
+}
+
 function getToken(): string {
   const token = process.env.LOYVERSE_API_TOKEN;
   if (!token) {
-    throw new Error(
+    throw new LoyverseApiError(
       "Falta LOYVERSE_API_TOKEN en el entorno. Copia .env.example como " +
         ".env.local y añade el token generado en el panel de Loyverse."
     );
@@ -16,13 +30,26 @@ function getToken(): string {
 }
 
 async function loyverseFetch<T>(path: string): Promise<T> {
-  const res = await fetch(`${LOYVERSE_API_BASE}${path}`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-    next: { revalidate: REVALIDATE_SECONDS },
-  });
+  let res: Response;
+
+  try {
+    res = await fetch(`${LOYVERSE_API_BASE}${path}`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+      next: { revalidate: REVALIDATE_SECONDS },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+  } catch (cause) {
+    const timedOut = cause instanceof Error && cause.name === "TimeoutError";
+    throw new LoyverseApiError(
+      timedOut
+        ? `Loyverse no respondió en ${REQUEST_TIMEOUT_MS}ms en ${path}`
+        : `No se pudo conectar con Loyverse en ${path}`,
+      { cause }
+    );
+  }
 
   if (!res.ok) {
-    throw new Error(`Loyverse API error ${res.status} en ${path}`);
+    throw new LoyverseApiError(`Loyverse API error ${res.status} en ${path}`);
   }
 
   return res.json() as Promise<T>;

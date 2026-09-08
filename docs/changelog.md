@@ -4,6 +4,28 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-08 — Manejo de errores si Loyverse falla
+
+- Se añade `LoyverseApiError` en `lib/loyverse.ts`: envuelve cualquier fallo
+  al hablar con Loyverse (timeout de 8s vía `AbortSignal.timeout`, error de
+  red, HTTP no-2xx, token ausente) en un tipo identificable.
+- Se añade `src/app/coleccion/[slug]/error.tsx` (convención `error.js` de
+  Next.js): si falla la carga de una colección, se muestra una pantalla en
+  marca con botón "Reintentar", en vez de la página de error genérica de
+  Next.
+- Se usa el prop `retry()` en vez de `reset()` — al leer la documentación
+  local de Next 16 (`node_modules/next/dist/docs/`) se descubrió que Next
+  16.3 estabilizó `retry()`, que sí vuelve a pedir los datos al servidor
+  (`reset()` no re-ejecuta el fetch, solo limpia el estado de error).
+- Probado de verdad: se puso un token inválido en `.env.local`, se
+  reinició el servidor de desarrollo, se confirmó que aparece el fallback
+  (no el error genérico) y que el servidor loguea `LoyverseApiError` con
+  el código HTTP real (401); luego se restauró el token y se confirmó que
+  la página vuelve a mostrar productos reales.
+- La home no necesita este manejo: no depende de Loyverse (el índice de
+  colecciones es estático), así que sigue funcionando aunque Loyverse esté
+  caído.
+
 ## 2026-09-08 — Despliegue a producción (Vercel + GitHub)
 
 - Se decide alojar en Vercel (integración nativa con Next.js, build/HTTPS

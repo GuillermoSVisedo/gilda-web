@@ -8,6 +8,7 @@ src/
     globals.css            Tokens de Tailwind v4 (colores, fuentes) + estilos base
     coleccion/[slug]/
       page.tsx              Página de una colección: productos reales + paginación
+      error.tsx              Fallback en marca si falla la llamada a Loyverse
   components/
     Header.tsx             Cabecera sticky: logo, navegación, CTA de WhatsApp
     Hero.tsx                Sección de portada (#inicio)
@@ -68,6 +69,34 @@ añada su nombre a `loyverseCategoryNames` del grupo correspondiente en
 `data/collections.ts` (o se cree un grupo nuevo). No hay lógica automática
 de "categoría nueva → aparece sola": fue una decisión consciente a cambio de
 una navegación más cuidada (ver discusión en el changelog del 2026-09-08).
+
+## Qué pasa si Loyverse falla
+
+`src/lib/loyverse.ts` define `LoyverseApiError` (subclase de `Error`) y la
+usa para envolver cualquier fallo al hablar con Loyverse: timeout (8s,
+`AbortSignal.timeout`), error de red, respuesta no-2xx, o token ausente.
+Como todo pasa por `loyverseFetch`, cualquier fallo de cualquiera de los
+tres endpoints (`getCategories`, `getAllItems`, `getAllInventory`) acaba
+siendo un `LoyverseApiError`.
+
+`src/app/coleccion/[slug]/error.tsx` es el *error boundary* de esa ruta
+(convención `error.js` de Next.js): si el Server Component de la página
+lanza mientras carga, en vez del error genérico de Next se muestra una
+pantalla en marca ("No hemos podido cargar esta colección") con un botón
+**Reintentar**. Ese botón usa el prop `retry()` (estable desde Next
+16.3, ver `node_modules/next/dist/docs/.../error.md`) — no `reset()` —
+porque `retry()` sí vuelve a pedir los datos al servidor; `reset()` solo
+limpiaría el estado de error sin re-ejecutar el fetch.
+
+La home (`/`) no necesita este manejo: no llama a Loyverse (`CollectionIndex`
+solo lee `data/collections.ts`, que es estático), así que sigue funcionando
+aunque Loyverse esté caído — el usuario solo pierde el catálogo, no la web
+entera.
+
+Probado manualmente: token inválido temporal → la página muestra el
+fallback y el servidor loguea `LoyverseApiError: Loyverse API error 401 en
+/inventory...`; con el token restaurado, la página vuelve a cargar los
+productos reales.
 
 ## Por qué no hay una API route de por medio
 

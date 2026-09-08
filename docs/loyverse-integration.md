@@ -61,6 +61,9 @@ online — eso sigue fuera de alcance (ver abajo).
 - Todo ocurre en Server Components — el token nunca llega al navegador, no
   hay una API route propia de por medio (no hace falta todavía, no hay
   interacción en el cliente).
+- Si Loyverse no responde (caída, timeout, token inválido), la página de
+  colección muestra un fallback en marca con botón "Reintentar" en vez de
+  romperse — ver detalle en [architecture.md](./architecture.md).
 
 ## Fuera de alcance (para más adelante)
 
