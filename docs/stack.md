@@ -10,8 +10,8 @@
 - Fuentes: `next/font/google` — Cormorant Garamond (serif, títulos) + Inter
   (sans, texto). Ver [design-system.md](./design-system.md).
 
-No hay backend ni base de datos todavía: es un sitio 100% estático (sin
-`fetch` a APIs externas). Eso llegará con la integración de Loyverse.
+No hay base de datos propia. El "backend" es la API de Loyverse, consultada
+desde Server Components — ver [loyverse-integration.md](./loyverse-integration.md).
 
 ## Por qué Next.js y no HTML estático
 
@@ -40,6 +40,19 @@ Otros comandos:
 npm run lint     # ESLint
 npm run build    # build de producción (incluye chequeo de tipos)
 ```
+
+## Despliegue
+
+- **Producción**: [gilda-web.vercel.app](https://gilda-web.vercel.app),
+  desplegado en Vercel desde la rama `main` — cada `git push` a `main`
+  despliega automáticamente.
+- **Repositorio**: [github.com/GuillermoSVisedo/gilda-web](https://github.com/GuillermoSVisedo/gilda-web).
+- La variable `LOYVERSE_API_TOKEN` está configurada directamente en Vercel
+  (Project Settings → Environment Variables), no solo en `.env.local`.
+- Para desplegar cambios: hacer commit y `git push origin main`. No hace
+  falta ningún paso manual adicional en Vercel.
+- Dominio propio: pendiente (por ahora se usa el subdominio gratuito de
+  Vercel, `*.vercel.app`).
 
 ## Variables de entorno
 

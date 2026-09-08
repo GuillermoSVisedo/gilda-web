@@ -4,6 +4,34 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-08 — Despliegue a producción (Vercel + GitHub)
+
+- Se decide alojar en Vercel (integración nativa con Next.js, build/HTTPS
+  automáticos, plan gratuito suficiente) en vez de servidor propio.
+- Registro en GitHub y Vercel hechos por el usuario (login/creación de
+  cuenta no son acciones que el asistente pueda hacer). El asistente no
+  pudo instalar/ejecutar una sugerencia de Vercel para añadir un "plugin"
+  (`npx plugins add vercel/vercel-plugin`) sin verificar antes qué era
+  exactamente — el usuario indicó ignorarla, queda sin investigar.
+- Para el push a GitHub por HTTPS hizo falta que el usuario configurase
+  `git config --global credential.helper manager` en su máquina (el
+  asistente tiene prohibido tocar la config de git); con eso, Git
+  Credential Manager gestionó el login por navegador.
+- Repositorio conectado: `git remote add origin
+  https://github.com/GuillermoSVisedo/gilda-web.git`, push de los 7
+  commits existentes a `main`.
+- Verificado `npm run build` limpio antes del despliegue (compila,
+  TypeScript sin errores, `/` estático, `/coleccion/[slug]` dinámico según
+  lo esperado).
+- Vercel importa el repo y despliega automáticamente en cada push a `main`.
+  `LOYVERSE_API_TOKEN` configurado como variable de entorno en Vercel
+  (Project Settings), no solo en `.env.local`.
+- Verificado en `https://gilda-web.vercel.app`: catálogo real (221
+  vestidos con precio y stock) cargando correctamente en producción, sin
+  errores de consola.
+- Se cierra el túnel de Cloudflare local (ya no hace falta: la web tiene
+  una URL de producción estable).
+
 ## 2026-09-08 — Pantone real de la marca
 
 - Se sustituye el verde oliva "aproximado" elegido inicialmente por el
