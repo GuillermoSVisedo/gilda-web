@@ -4,6 +4,16 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-08 — Pantone real de la marca
+
+- Se sustituye el verde oliva "aproximado" elegido inicialmente por el
+  Pantone real de Gilda: `#636B2F`. Pasa a ser `--color-olive-dark` en
+  `globals.css`; `--color-olive` (fondos claros) y `--color-olive-deep`
+  (hover) se recalculan a partir de ese valor para mantener la misma
+  relación tonal que antes. Verificado en navegador vía
+  `getComputedStyle` (el panel estaba oculto, sin captura visual posible)
+  que el color renderizado es exactamente `rgb(99, 107, 47)`.
+
 ## 2026-09-08 — Mapa real de la tienda
 
 - Se sustituye el bloque placeholder "Mapa de la tienda (pendiente de
