@@ -11,7 +11,7 @@ exactamente (`grep -rn "TODO" src/`).
 | Foto de tienda/equipo | [`About.tsx`](../src/components/About.tsx) | Bloque con borde discontinuo |
 | Dirección | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real, desde Loyverse: Av. de Madrid, 50, Navacerrada |
 | Horario | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: viernes, sábados y domingos, con horario de invierno y de verano (solo abre esos tres días) |
-| Teléfono / email | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: +34 614 93 49 15 / carmenlgperalta@gmail.com |
+| Teléfono / email | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: +34 614 93 49 15 / gildanavacerrada@gmail.com |
 | Instagram | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: instagram.com/gildanavacerrada |
 | Mapa de la tienda | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: iframe de Google Maps con la dirección real (sin API key) |
 | Favicon / logo real | `src/app/favicon.ico`, `public/` | Icono por defecto de Next.js |

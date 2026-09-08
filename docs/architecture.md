@@ -40,8 +40,15 @@ partir de `data/collections.ts`. Cada página:
 2. Pide a Loyverse (vía `lib/collections.ts` → `lib/loyverse.ts`) las
    categorías, todos los productos y todo el inventario.
 3. Filtra los productos cuya categoría de Loyverse pertenece a esa colección.
-4. Pagina el resultado en el servidor (24 productos por página, parámetro
+4. Si el visitante ha activado el filtro (parámetro `?stock=1`), descarta
+   los productos con `inStock === 0` antes de paginar.
+5. Pagina el resultado en el servidor (24 productos por página, parámetro
    `?page=N` en la URL) y pinta `ProductGrid`.
+
+El filtro "Solo en stock" es un enlace que añade/quita `?stock=1` en la URL
+— sin JavaScript de cliente, coherente con que toda la página es server-
+rendered. `PageLink` (paginación) propaga `stock=1` si está activo, para no
+perder el filtro al cambiar de página.
 
 Se eligió **una página por colección** (en vez de todo en una sola página
 larga) porque el catálogo real tiene más de 1.500 productos — comprobado el

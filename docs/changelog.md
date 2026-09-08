@@ -4,6 +4,20 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-08 — Email corregido + filtro "solo en stock"
+
+- El email de contacto que se había dado antes
+  (carmenlgperalta@gmail.com) era incorrecto; se corrige a
+  gildanavacerrada@gmail.com en `Contact.tsx`.
+- Se añade un filtro "Solo en stock" en `/coleccion/[slug]`: un enlace que
+  activa/desactiva `?stock=1` en la URL y descarta productos con
+  `inStock === 0` antes de paginar. Sin JavaScript de cliente (coherente
+  con el resto de la página, que es server-rendered). La paginación
+  (`PageLink`) propaga el filtro para no perderlo al cambiar de página.
+- Probado en una colección pequeña (Joyería y bisutería: 29 → 20 al
+  filtrar) y en una grande (Vestidos, 221 productos: `Siguiente` genera
+  `?page=2&stock=1`, confirma que el filtro sobrevive a la paginación).
+
 ## 2026-09-08 — Manejo de errores si Loyverse falla
 
 - Se añade `LoyverseApiError` en `lib/loyverse.ts`: envuelve cualquier fallo

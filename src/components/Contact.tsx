@@ -3,7 +3,7 @@
 const STORE = {
   address: "Av. de Madrid, 50 — 28491 Navacerrada, Madrid",
   phone: "+34 614 93 49 15",
-  email: "carmenlgperalta@gmail.com",
+  email: "gildanavacerrada@gmail.com",
   hours: {
     invierno: [
       "Viernes: 17:30 – 20:30",
