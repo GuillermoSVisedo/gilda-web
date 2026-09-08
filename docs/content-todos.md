@@ -6,12 +6,12 @@ exactamente (`grep -rn "TODO" src/`).
 
 | Dato | Dónde | Valor actual |
 | --- | --- | --- |
-| Número de WhatsApp | [`Header.tsx`](../src/components/Header.tsx), [`Contact.tsx`](../src/components/Contact.tsx), [`ComingSoon.tsx`](../src/components/ComingSoon.tsx) | Placeholder `+34 600 000 000` |
+| Número de WhatsApp | [`Header.tsx`](../src/components/Header.tsx), [`Contact.tsx`](../src/components/Contact.tsx), [`ComingSoon.tsx`](../src/components/ComingSoon.tsx) | ✅ Real: +34 614 93 49 15 |
 | Historia / texto de marca | [`About.tsx`](../src/components/About.tsx) | Texto genérico de ejemplo |
 | Foto de tienda/equipo | [`About.tsx`](../src/components/About.tsx) | Bloque con borde discontinuo |
 | Dirección | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real, desde Loyverse: Av. de Madrid, 50, Navacerrada |
 | Horario | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: viernes, sábados y domingos, con horario de invierno y de verano (solo abre esos tres días) |
-| Teléfono / email | [`Contact.tsx`](../src/components/Contact.tsx) | Placeholder `hola@gilda.com` |
+| Teléfono / email | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: +34 614 93 49 15 / carmenlgperalta@gmail.com |
 | Instagram | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: instagram.com/gildanavacerrada |
 | Mapa de la tienda | [`Contact.tsx`](../src/components/Contact.tsx) | Bloque con borde discontinuo (pendiente iframe de Google Maps, ya con la dirección real) |
 | Favicon / logo real | `src/app/favicon.ico`, `public/` | Icono por defecto de Next.js |

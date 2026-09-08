@@ -5,8 +5,7 @@ const NAV_LINKS = [
   { label: "Contacto", href: "#contacto" },
 ];
 
-// TODO: sustituye por el número de WhatsApp real de la tienda (formato 34XXXXXXXXX).
-const WHATSAPP_LINK = "https://wa.me/34600000000";
+const WHATSAPP_LINK = "https://wa.me/34614934915";
 
 export default function Header() {
   return (

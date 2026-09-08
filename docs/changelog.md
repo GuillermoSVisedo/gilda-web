@@ -4,6 +4,16 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-08 — Teléfono/WhatsApp y email reales
+
+- Se sustituye el número de WhatsApp placeholder (`Header.tsx`,
+  `ComingSoon.tsx`, `Contact.tsx`) por el real: +34 614 93 49 15.
+- Se sustituye el email placeholder de `Contact.tsx` por el real de
+  contacto: carmenlgperalta@gmail.com.
+- Con esto, todos los datos de contacto de `Contact.tsx` son ya reales
+  (dirección, horario, teléfono, email, Instagram) salvo la foto de la
+  tienda y el mapa — ver [content-todos.md](./content-todos.md).
+
 ## 2026-09-08 — Instagram real + horario real + túnel de Cloudflare
 
 - Se sustituye el Instagram placeholder de `Contact.tsx` por el real:

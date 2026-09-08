@@ -1,10 +1,9 @@
-// Dirección real (Loyverse, 2026-09-08), Instagram real (2026-09-08) y
-// horario real (2026-09-08). El resto sigue sin confirmar — TODO: sustituir
-// por los datos reales (teléfono, email).
+// Todos los datos son reales (Loyverse + confirmados por el usuario,
+// 2026-09-08).
 const STORE = {
   address: "Av. de Madrid, 50 — 28491 Navacerrada, Madrid",
-  phone: "+34 600 000 000",
-  email: "hola@gilda.com",
+  phone: "+34 614 93 49 15",
+  email: "carmenlgperalta@gmail.com",
   hours: {
     invierno: [
       "Viernes: 17:30 – 20:30",
@@ -18,7 +17,7 @@ const STORE = {
     ],
   },
   instagram: "https://www.instagram.com/gildanavacerrada/",
-  whatsapp: "https://wa.me/34600000000",
+  whatsapp: "https://wa.me/34614934915",
 };
 
 export default function Contact() {
