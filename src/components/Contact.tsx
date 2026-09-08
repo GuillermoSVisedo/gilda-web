@@ -1,11 +1,11 @@
-// Dirección real, obtenida de la ficha de tienda en Loyverse (2026-09-08).
+// Dirección real (Loyverse, 2026-09-08) e Instagram real (2026-09-08).
 // El resto de datos siguen sin confirmar — TODO: sustituir por los reales.
 const STORE = {
   address: "Av. de Madrid, 50 — 28491 Navacerrada, Madrid",
   phone: "+34 600 000 000",
   email: "hola@gilda.com",
   hours: ["Lunes a viernes: 10:00 – 20:00", "Sábados: 10:00 – 14:00"],
-  instagram: "https://instagram.com/gilda",
+  instagram: "https://www.instagram.com/gildanavacerrada/",
   whatsapp: "https://wa.me/34600000000",
 };
 

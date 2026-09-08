@@ -4,6 +4,17 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-08 — Instagram real + túnel de Cloudflare para preview
+
+- Se sustituye el Instagram placeholder de `Contact.tsx` por el real:
+  instagram.com/gildanavacerrada.
+- Se levanta un túnel rápido de Cloudflare (`cloudflared tunnel --url
+  http://localhost:3210`, sin cuenta) para enseñar la web en red mientras
+  el servidor de desarrollo sigue corriendo en local. Es una URL temporal
+  de `trycloudflare.com`, sin autenticación — cualquiera con el enlace ve
+  el catálogo completo mientras el túnel esté activo. No es para producción,
+  solo para previews puntuales.
+
 ## 2026-09-08 — Fase 1 de Loyverse implementada: catálogo con stock real
 
 - El usuario genera el token de acceso a la API en el panel de Loyverse y lo

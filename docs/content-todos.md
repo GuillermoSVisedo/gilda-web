@@ -12,7 +12,7 @@ exactamente (`grep -rn "TODO" src/`).
 | Dirección | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real, desde Loyverse: Av. de Madrid, 50, Navacerrada |
 | Horario | [`Contact.tsx`](../src/components/Contact.tsx) | Placeholder: L-V 10-20h, sáb 10-14h |
 | Teléfono / email | [`Contact.tsx`](../src/components/Contact.tsx) | Placeholder `hola@gilda.com` |
-| Instagram | [`Contact.tsx`](../src/components/Contact.tsx) | Placeholder `instagram.com/gilda` (no verificado) |
+| Instagram | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: instagram.com/gildanavacerrada |
 | Mapa de la tienda | [`Contact.tsx`](../src/components/Contact.tsx) | Bloque con borde discontinuo (pendiente iframe de Google Maps, ya con la dirección real) |
 | Favicon / logo real | `src/app/favicon.ico`, `public/` | Icono por defecto de Next.js |
 | **Fotos de producto** | [`ProductGrid.tsx`](../src/components/ProductGrid.tsx) | Bloque "Sin foto" — ningún producto tiene `image_url` en Loyverse todavía. Sustituir subiendo fotos en Loyverse, no aquí. |
