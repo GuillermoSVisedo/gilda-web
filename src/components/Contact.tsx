@@ -18,6 +18,11 @@ const STORE = {
   },
   instagram: "https://www.instagram.com/gildanavacerrada/",
   whatsapp: "https://wa.me/34614934915",
+  // Embed de Google Maps sin API key (query con la dirección real).
+  mapsEmbedUrl:
+    "https://www.google.com/maps?q=Av.+de+Madrid,+50,+28491+Navacerrada,+Madrid&output=embed",
+  mapsUrl:
+    "https://www.google.com/maps/search/?api=1&query=Av.+de+Madrid,+50,+28491+Navacerrada,+Madrid",
 };
 
 export default function Contact() {
@@ -92,14 +97,23 @@ export default function Contact() {
           </div>
         </div>
 
-        {/* TODO: sustituir por un mapa real (ej. iframe de Google Maps) cuando
-            se tenga la dirección definitiva. */}
-        <div className="flex aspect-square items-center justify-center rounded-2xl border border-dashed border-olive-dark/50 bg-olive/40 md:aspect-auto">
-          <span className="px-8 text-center text-sm tracking-wide text-charcoal-soft">
-            Mapa de la tienda
-            <br />
-            (pendiente de añadir)
-          </span>
+        <div className="flex aspect-square flex-col gap-2 md:aspect-auto">
+          <div className="flex-1 overflow-hidden rounded-2xl border border-line/70">
+            <iframe
+              src={STORE.mapsEmbedUrl}
+              title="Mapa de la tienda Gilda"
+              loading="lazy"
+              className="h-full min-h-80 w-full border-0"
+            />
+          </div>
+          <a
+            href={STORE.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-olive-dark hover:underline"
+          >
+            Abrir en Google Maps →
+          </a>
         </div>
       </div>
     </section>

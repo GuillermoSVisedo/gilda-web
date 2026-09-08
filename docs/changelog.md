@@ -4,6 +4,17 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-08 — Mapa real de la tienda
+
+- Se sustituye el bloque placeholder "Mapa de la tienda (pendiente de
+  añadir)" de `Contact.tsx` por un iframe real de Google Maps con la
+  dirección de la tienda (`www.google.com/maps?q=...&output=embed` — no
+  requiere API key). Se añade también un enlace "Abrir en Google Maps"
+  fuera del iframe (envolver el iframe en un `<a>` no funciona: el iframe
+  captura los clics).
+- Con esto, `Contact.tsx` ya no tiene ningún dato placeholder salvo la foto
+  de la tienda/equipo (sigue en `About.tsx`).
+
 ## 2026-09-08 — Teléfono/WhatsApp y email reales
 
 - Se sustituye el número de WhatsApp placeholder (`Header.tsx`,

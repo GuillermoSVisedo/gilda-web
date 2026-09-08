@@ -13,7 +13,7 @@ exactamente (`grep -rn "TODO" src/`).
 | Horario | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: viernes, sábados y domingos, con horario de invierno y de verano (solo abre esos tres días) |
 | Teléfono / email | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: +34 614 93 49 15 / carmenlgperalta@gmail.com |
 | Instagram | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: instagram.com/gildanavacerrada |
-| Mapa de la tienda | [`Contact.tsx`](../src/components/Contact.tsx) | Bloque con borde discontinuo (pendiente iframe de Google Maps, ya con la dirección real) |
+| Mapa de la tienda | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: iframe de Google Maps con la dirección real (sin API key) |
 | Favicon / logo real | `src/app/favicon.ico`, `public/` | Icono por defecto de Next.js |
 | **Fotos de producto** | [`ProductGrid.tsx`](../src/components/ProductGrid.tsx) | Bloque "Sin foto" — ningún producto tiene `image_url` en Loyverse todavía. Sustituir subiendo fotos en Loyverse, no aquí. |
 
