@@ -131,10 +131,12 @@ sí tendrá sentido añadir un route handler.
 
 ## Componentes: notas concretas
 
-- **Header.tsx**: la navegación (`NAV_LINKS`) es una lista fija de anclas
-  generales (Inicio, Sobre nosotras, Colecciones, Contacto). Las 10
-  colecciones NO están en el header — para eso está `CollectionIndex` dentro
-  de la home.
+- **Header.tsx**: la navegación (`NAV_LINKS`) es una lista fija de anclas a
+  secciones de la home (Inicio, Sobre nosotras, Colecciones, Contacto). El
+  header se renderiza en todas las páginas (incluidas las de colección), así
+  que los hrefs llevan `/` delante (`/#contacto`, no `#contacto`) — si no,
+  el enlace no hace nada estando fuera de la home. Las 10 colecciones NO
+  están en el header — para eso está `CollectionIndex` dentro de la home.
 - **ProductGrid.tsx**: pinta las tarjetas de producto reales (nombre, precio,
   stock). Ningún producto tiene foto subida en Loyverse todavía, así que cada
   tarjeta lleva un bloque "Sin foto" — sustituir por `next/image` en cuanto

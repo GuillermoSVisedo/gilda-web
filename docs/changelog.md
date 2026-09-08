@@ -4,6 +4,25 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-08 — Bug: la nav del header no funcionaba fuera de la home
+
+- El usuario reporta que, estando en una colección (ej.
+  `/coleccion/vestidos`), pulsar "Contacto" en el header no llevaba a
+  ningún sitio. Causa: `NAV_LINKS` y el logo usaban anclas relativas
+  (`#contacto`, `#inicio`...), que solo funcionan si ya estás en `/` — esas
+  secciones no existen en `/coleccion/[slug]`.
+- Corregido en `Header.tsx`: todos los hrefs de `NAV_LINKS` llevan `/`
+  delante (`/#contacto`, etc.) para que funcionen desde cualquier ruta; el
+  logo pasa a usar `next/link` apuntando a `/` (lint obligaba a `Link` en
+  vez de `<a>` para enlaces internos sin ancla).
+- Verificado: navegar a `/#contacto` desde otra ruta carga la home y hace
+  scroll hasta la sección de contacto (comprobado con
+  `getBoundingClientRect` — el contenido queda justo debajo del header
+  sticky).
+- Los CTA de `Hero.tsx` (`#colecciones`, `#contacto`) no se tocaron: ese
+  componente solo se renderiza en la home, así que las anclas relativas ahí
+  sí son correctas.
+
 ## 2026-09-08 — Email corregido + filtro "solo en stock"
 
 - El email de contacto que se había dado antes
