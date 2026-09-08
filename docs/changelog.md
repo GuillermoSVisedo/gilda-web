@@ -4,10 +4,14 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
-## 2026-09-08 — Instagram real + túnel de Cloudflare para preview
+## 2026-09-08 — Instagram real + horario real + túnel de Cloudflare
 
 - Se sustituye el Instagram placeholder de `Contact.tsx` por el real:
   instagram.com/gildanavacerrada.
+- Se añade el horario real de la tienda: solo abre viernes, sábados y
+  domingos (nada de lunes a jueves), con horario de invierno y de verano
+  distintos. Se muestran ambos horarios etiquetados en `Contact.tsx` — no
+  hay fecha de corte automática entre temporadas, se listan los dos.
 - Se levanta un túnel rápido de Cloudflare (`cloudflared tunnel --url
   http://localhost:3210`, sin cuenta) para enseñar la web en red mientras
   el servidor de desarrollo sigue corriendo en local. Es una URL temporal

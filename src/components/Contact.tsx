@@ -1,10 +1,22 @@
-// Dirección real (Loyverse, 2026-09-08) e Instagram real (2026-09-08).
-// El resto de datos siguen sin confirmar — TODO: sustituir por los reales.
+// Dirección real (Loyverse, 2026-09-08), Instagram real (2026-09-08) y
+// horario real (2026-09-08). El resto sigue sin confirmar — TODO: sustituir
+// por los datos reales (teléfono, email).
 const STORE = {
   address: "Av. de Madrid, 50 — 28491 Navacerrada, Madrid",
   phone: "+34 600 000 000",
   email: "hola@gilda.com",
-  hours: ["Lunes a viernes: 10:00 – 20:00", "Sábados: 10:00 – 14:00"],
+  hours: {
+    invierno: [
+      "Viernes: 17:30 – 20:30",
+      "Sábados: 11:00 – 14:30 y 17:30 – 20:30",
+      "Domingos: 11:00 – 14:30",
+    ],
+    verano: [
+      "Viernes: 18:30 – 21:30",
+      "Sábados: 11:00 – 14:30 y 18:30 – 21:30",
+      "Domingos: 11:00 – 14:30",
+    ],
+  },
   instagram: "https://www.instagram.com/gildanavacerrada/",
   whatsapp: "https://wa.me/34600000000",
 };
@@ -35,7 +47,18 @@ export default function Contact() {
               <dt className="text-xs tracking-wide text-charcoal uppercase">
                 Horario
               </dt>
-              {STORE.hours.map((line) => (
+              <p className="mt-2 text-xs tracking-wide text-olive-dark uppercase">
+                Invierno
+              </p>
+              {STORE.hours.invierno.map((line) => (
+                <dd className="mt-1" key={line}>
+                  {line}
+                </dd>
+              ))}
+              <p className="mt-3 text-xs tracking-wide text-olive-dark uppercase">
+                Verano
+              </p>
+              {STORE.hours.verano.map((line) => (
                 <dd className="mt-1" key={line}>
                   {line}
                 </dd>
