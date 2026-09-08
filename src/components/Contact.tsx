@@ -1,6 +1,7 @@
-// TODO: sustituir todos los datos de esta sección por los reales de la tienda.
+// Dirección real, obtenida de la ficha de tienda en Loyverse (2026-09-08).
+// El resto de datos siguen sin confirmar — TODO: sustituir por los reales.
 const STORE = {
-  address: "Calle Ejemplo, 12 — 28000 Madrid",
+  address: "Av. de Madrid, 50 — 28491 Navacerrada, Madrid",
   phone: "+34 600 000 000",
   email: "hola@gilda.com",
   hours: ["Lunes a viernes: 10:00 – 20:00", "Sábados: 10:00 – 14:00"],

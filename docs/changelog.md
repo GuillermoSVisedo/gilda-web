@@ -4,6 +4,38 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-08 — Fase 1 de Loyverse implementada: catálogo con stock real
+
+- El usuario genera el token de acceso a la API en el panel de Loyverse y lo
+  comparte para guardarlo en `.env.local` (nunca en el repositorio).
+- Se prueba la API directamente (curl) antes de escribir código: confirma
+  que el token funciona, revela el catálogo real (**más de 1.500
+  productos**, no una tienda de prueba) y que la API **no admite filtrar
+  `/items` por categoría** (parámetros `category_id`/`category_ids`
+  ignorados) — hay que traer todo y filtrar en memoria.
+- Dado el tamaño real del catálogo, se replantea la arquitectura ya montada
+  el día anterior (todo en la home, anclas por categoría) por: una página
+  dedicada por colección (`/coleccion/[slug]`) con paginación, y las 35
+  categorías reales de Loyverse agrupadas a mano en 10 colecciones
+  curadas. Decisión tomada con el usuario antes de tocar código (dos
+  preguntas: estructura de navegación y si agrupar categorías).
+- Se construye la capa de datos: `lib/loyverse.ts` (cliente de la API con
+  paginación por cursor y caché de 5 min) y `lib/collections.ts` (cruce
+  colección ↔ categoría real ↔ producto ↔ stock).
+- Se sustituyen `CategoryIndex`/`CategorySection` (placeholders) por
+  `CollectionIndex` (enlaza a páginas reales) y `ProductGrid` (tarjetas de
+  producto con nombre, precio y stock reales).
+- Se actualiza `Contact.tsx` con la dirección real de la tienda (obtenida de
+  Loyverse: Av. de Madrid, 50, Navacerrada, Madrid) y `ComingSoon.tsx` para
+  reflejar que el stock ya es real (antes decía "muy pronto").
+- Hallazgos de calidad de datos en Loyverse (no corregidos desde la web,
+  solo documentados): un producto sin categoría, uno mal categorizado, y
+  productos sin precio. Detalle en
+  [loyverse-integration.md](./loyverse-integration.md).
+- Verificado en navegador con datos reales (paginación, precios, stock,
+  colecciones pequeñas y grandes), sin errores de consola, lint y
+  `tsc --noEmit` limpios.
+
 ## 2026-09-08 — Preparación de la integración con Loyverse
 
 - Se acuerda el alcance de la fase 1 de Loyverse: solo mostrar stock en

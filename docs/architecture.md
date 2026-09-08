@@ -3,65 +3,108 @@
 ```
 src/
   app/
-    layout.tsx      Layout raíz: fuentes, <html>/<body>, metadata (title/description)
-    page.tsx         Página única ("/"): monta todas las secciones en orden
-    globals.css       Tokens de Tailwind v4 (colores, fuentes) + estilos base
+    layout.tsx           Layout raíz: fuentes, <html>/<body>, metadata (title/description)
+    page.tsx              Home ("/"): hero, sobre nosotras, índice de colecciones, contacto
+    globals.css            Tokens de Tailwind v4 (colores, fuentes) + estilos base
+    coleccion/[slug]/
+      page.tsx              Página de una colección: productos reales + paginación
   components/
-    Header.tsx        Cabecera sticky: logo, navegación, CTA de WhatsApp
-    Hero.tsx           Sección de portada (#inicio)
-    About.tsx          Sección "sobre Gilda" (#sobre-gilda)
-    CategoryIndex.tsx  Índice de categorías con enlaces ancla (#colecciones)
-    CategorySection.tsx  Sección repetible: una por categoría, con productos placeholder
-    ComingSoon.tsx     Banner "tienda online muy pronto"
-    Contact.tsx        Dirección, horario, contacto, redes (#contacto)
-    Footer.tsx         Pie de página
+    Header.tsx             Cabecera sticky: logo, navegación, CTA de WhatsApp
+    Hero.tsx                Sección de portada (#inicio)
+    About.tsx                Sección "sobre Gilda" (#sobre-gilda)
+    CollectionIndex.tsx      Índice de las 10 colecciones, enlaza a /coleccion/[slug] (#colecciones)
+    ProductGrid.tsx           Grid de tarjetas de producto (usado en la página de colección)
+    ComingSoon.tsx           Banner "cómo comprar ahora mismo"
+    Contact.tsx               Dirección, horario, contacto, redes (#contacto)
+    Footer.tsx                Pie de página
   data/
-    categories.ts      Fuente de verdad de las categorías (ver más abajo)
+    collections.ts           Las 10 colecciones curadas y a qué categorías de Loyverse
+                               corresponde cada una (ver más abajo)
+  lib/
+    loyverse.ts                Cliente de la API de Loyverse (fetch + paginación + tipos)
+    collections.ts              Cruza colecciones ↔ categorías/productos/stock reales de Loyverse
 ```
 
-## Flujo de la página
+## Flujo de páginas
 
-`src/app/page.tsx` renderiza las secciones en este orden fijo:
+**Home (`/`)**: `Header`, `Hero`, `About`, `CollectionIndex` (enlaza a cada
+colección), `ComingSoon`, `Contact`, `Footer`. Es la web de presentación
+original — no lista productos directamente.
 
-1. `Header` (fuera de `<main>`, sticky)
-2. `Hero`
-3. `About`
-4. `CategoryIndex` — pastillas que enlazan a cada `#slug` de categoría
-5. Un `CategorySection` por cada entrada de `CATEGORIES` (bucle `.map`)
-6. `ComingSoon`
-7. `Contact`
-8. `Footer`
+**Colección (`/coleccion/[slug]`)**: una página por colección
+(`/coleccion/vestidos`, `/coleccion/zapatos`, etc.), generada dinámicamente a
+partir de `data/collections.ts`. Cada página:
 
-Es una página de una sola ruta (`/`) con navegación por anclas (`#inicio`,
-`#sobre-gilda`, `#colecciones`, `#<slug-categoría>`, `#contacto`). Todas las
-secciones con ancla llevan la clase `scroll-mt-24` para que el contenido no
-quede oculto bajo el header sticky al saltar a ellas.
+1. Resuelve la colección por `slug` (404 con `notFound()` si no existe).
+2. Pide a Loyverse (vía `lib/collections.ts` → `lib/loyverse.ts`) las
+   categorías, todos los productos y todo el inventario.
+3. Filtra los productos cuya categoría de Loyverse pertenece a esa colección.
+4. Pagina el resultado en el servidor (24 productos por página, parámetro
+   `?page=N` en la URL) y pinta `ProductGrid`.
 
-## Categorías como fuente de datos separada
+Se eligió **una página por colección** (en vez de todo en una sola página
+larga) porque el catálogo real tiene más de 1.500 productos — comprobado el
+2026-09-08 vía API. Ver [loyverse-integration.md](./loyverse-integration.md).
 
-`src/data/categories.ts` exporta un array `CATEGORIES` con `{ slug, name,
-description }`. Tanto `CategoryIndex` como el bucle en `page.tsx` leen de ahí
-— no hay nombres de categoría hardcodeados en los componentes de UI.
+## Colecciones curadas vs. categorías reales de Loyverse
 
-Esto es deliberado: es el punto de enganche pensado para Loyverse. Cuando se
-conecte la API, `CATEGORIES` (y los productos placeholder dentro de
-`CategorySection`) se sustituirán por datos obtenidos de Loyverse (server
-component con `fetch`, o un route handler que haga de proxy/caché). Ver
-[loyverse-integration.md](./loyverse-integration.md).
+Loyverse tiene 35 categorías reales, muy desiguales en tamaño (desde 1 hasta
+más de 200 productos). Se decidió **agruparlas a mano en 10 colecciones**
+para la navegación de la web, en vez de mostrar las 35 tal cual.
+
+`src/data/collections.ts` exporta `COLLECTIONS`: cada colección tiene
+`slug`, `name`, `description` y `loyverseCategoryNames` (los nombres de
+categoría de Loyverse que agrupa, ej. `"chaquetas-y-abrigos"` agrupa
+`CHAQUETA`, `ABRIGO`, `AMERICANA`, `CAPAS`, `PONCHO`).
+
+`src/lib/collections.ts` (`getCollectionProducts`) hace el cruce en tiempo
+de ejecución: pide categorías + items + inventario a Loyverse, resuelve qué
+`category_id` de Loyverse corresponde a los nombres de la colección, y
+filtra/enriquece los productos con precio y stock real.
+
+**Mantenimiento**: si en Loyverse se crea una categoría nueva que no encaje
+en ninguna de las 10, sus productos no aparecerán en la web hasta que se
+añada su nombre a `loyverseCategoryNames` del grupo correspondiente en
+`data/collections.ts` (o se cree un grupo nuevo). No hay lógica automática
+de "categoría nueva → aparece sola": fue una decisión consciente a cambio de
+una navegación más cuidada (ver discusión en el changelog del 2026-09-08).
+
+## Por qué no hay una API route de por medio
+
+La lectura de datos de Loyverse ocurre directamente en Server Components
+(`src/app/coleccion/[slug]/page.tsx`), no a través de un route handler
+propio (`/api/loyverse/...`). Motivo: no hay ninguna interacción del lado
+cliente todavía (no hay buscador ni filtros con JS) — con Server Components
+el token de Loyverse nunca sale del servidor y no hace falta una capa extra.
+Si más adelante se necesita filtrar/buscar con JavaScript en el cliente, ahí
+sí tendrá sentido añadir un route handler.
+
+## Caché y paginación contra la API de Loyverse
+
+- La API de Loyverse **no admite filtrar `/items` por categoría** (los
+  parámetros `category_id`/`category_ids` se probaron manualmente y se
+  ignoran). Por eso `lib/loyverse.ts` trae **todos** los productos e
+  inventario (paginando con el `cursor` que devuelve la API) y el filtrado
+  por colección se hace en memoria, en `lib/collections.ts`.
+- Cada `fetch` a Loyverse usa `next: { revalidate: 300 }` (5 minutos). Es un
+  catálogo informativo de solo lectura — no hace falta consultar Loyverse en
+  cada visita; Next.js cachea la respuesta y la reutiliza entre peticiones
+  durante esos 5 minutos.
+- El stock (`in_stock`) vive en el endpoint `/inventory`, separado de
+  `/items`, y se cruza por `variant_id`.
 
 ## Componentes: notas concretas
 
 - **Header.tsx**: la navegación (`NAV_LINKS`) es una lista fija de anclas
-  generales (Inicio, Sobre nosotras, Colecciones, Contacto). Las categorías
-  individuales NO están en el header para evitar que la nav crezca sin
-  límite cuando Loyverse traiga muchas categorías; para eso está
-  `CategoryIndex` dentro de la propia página.
-- **CategorySection.tsx**: recibe una `Category` por props y pinta un grid de
-  4 tarjetas placeholder (`PLACEHOLDER_PRODUCTS = 4`). Cuando haya productos
-  reales, esta tarjeta placeholder es la que se sustituye por una tarjeta de
-  producto real (foto, nombre, precio, disponibilidad).
-- **About.tsx / Contact.tsx**: contienen datos de ejemplo (dirección,
-  teléfono, historia de la marca) marcados con comentarios `// TODO`. Listado
+  generales (Inicio, Sobre nosotras, Colecciones, Contacto). Las 10
+  colecciones NO están en el header — para eso está `CollectionIndex` dentro
+  de la home.
+- **ProductGrid.tsx**: pinta las tarjetas de producto reales (nombre, precio,
+  stock). Ningún producto tiene foto subida en Loyverse todavía, así que cada
+  tarjeta lleva un bloque "Sin foto" — sustituir por `next/image` en cuanto
+  haya fotos.
+- **About.tsx / Contact.tsx**: contienen datos de ejemplo, salvo la
+  dirección de `Contact.tsx` (ya es la real, obtenida de Loyverse). Listado
   completo en [content-todos.md](./content-todos.md).
 
 ## Convenciones

@@ -43,15 +43,21 @@ npm run build    # build de producción (incluye chequeo de tipos)
 
 ## Variables de entorno
 
-El proyecto no necesitaba ninguna hasta ahora. Con la integración de
-Loyverse en marcha, hace falta `LOYVERSE_API_TOKEN` (token de acceso a la
-API de Loyverse). Ver plantilla en [`.env.example`](../.env.example) y
-detalle de la integración en [loyverse-integration.md](./loyverse-integration.md).
+- `LOYVERSE_API_TOKEN` — token de acceso a la API de Loyverse, usado por
+  `src/lib/loyverse.ts`. Ver plantilla en [`.env.example`](../.env.example)
+  y detalle en [loyverse-integration.md](./loyverse-integration.md).
 
-**Regla fija: ninguna credencial (token, contraseña, clave de API) se pega
-en el chat ni se escribe en el repositorio.** Van siempre en `.env.local`
-(ya excluido en `.gitignore`), que cada persona rellena en su propia
-máquina.
+Va en `.env.local` (ya excluido en `.gitignore`), nunca en el repositorio.
+Idealmente tampoco se pega en el chat — en la práctica, la primera vez se
+compartió así (captura de pantalla del panel de Loyverse) y se guardó
+directamente en `.env.local` sin usarse para nada más. Si una credencial
+queda escrita en el historial de una conversación, lo más seguro es tratarla
+como potencialmente expuesta (revocarla/regenerarla desde Loyverse si hay
+dudas).
+
+**Nunca se acepta ni se usa la contraseña de la cuenta de Loyverse (login de
+usuario)** — solo tokens de API, que son revocables y de alcance limitado.
+Ver la entrada del 2026-09-08 en [changelog.md](./changelog.md).
 
 ## Notas sobre la versión de Next.js
 
