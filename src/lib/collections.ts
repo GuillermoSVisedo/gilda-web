@@ -1,6 +1,6 @@
 import type { Collection } from "@/data/collections";
 import { getAllInventory, getAllItems, getCategories } from "./loyverse";
-import { buildStockMap, sortProductsByName, toProduct } from "./products";
+import { buildStockMap, sortByName, toProduct } from "./products";
 
 export type { Product } from "./products";
 
@@ -32,5 +32,5 @@ export async function getCollectionProducts(collection: Collection) {
     )
     .map((item) => toProduct(item, stockByVariant));
 
-  return sortProductsByName(products);
+  return sortByName(products);
 }

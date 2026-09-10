@@ -4,6 +4,44 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-10 — Agrupado por talla (mismo artículo, varias tallas)
+
+- El usuario reporta que Loyverse solo permite 1 foto por producto (no es
+  algo arreglable desde la web) y pide agrupar el mismo artículo mostrando
+  las tallas disponibles — porque cada talla está cargada en Loyverse como
+  un producto suelto, con la talla escrita a mano en el nombre.
+- Antes de tocar código, se descargan los 1.502 nombres reales y se analiza
+  la última palabra de cada uno: la mayoría termina en talla (S, M, L, TU,
+  tallas numéricas de zapato...), pero no todos — algunos terminan en color
+  (ej. "Vestido azul") y al menos uno tiene la talla en medio del nombre
+  ("Blusón XL granate"). Esto descarta un "quitar siempre la última
+  palabra" y confirma que hace falta una lista cerrada de tallas conocidas.
+- Se implementa `groupProductsBySize` en `lib/products.ts`: detecta la talla
+  contra un vocabulario cerrado (`TU, XS, S, M, L, XL, XXL, XXXL, SM, ML` +
+  numéricas de calzado), agrupa por el resto del nombre, suma el stock de
+  cada talla (hay duplicados reales en Loyverse — "Camisa blanca cuello"
+  tenía "S" repetido 3 veces) y ordena las tallas de forma natural.
+  **Deliberadamente no agrupa también por color** (ej. "Alpargata burdeos"
+  y "Alpargata camel" siguen siendo artículos distintos) — agrupar por
+  color exigiría adivinar qué palabra es el color, con mucho más riesgo de
+  mezclar artículos que no tienen nada que ver.
+- `ProductGrid` pasa a recibir `GroupedProduct[]` y pinta las tallas como
+  pastillas (disponible / agotada tachada) en vez de un único "En stock
+  (N)".
+- Refactor de paso: `paginateProducts` y `sortProductsByName` (renombrada
+  `sortByName`) se hacen genéricos para poder usarse tanto con `Product[]`
+  como con `GroupedProduct[]`.
+- Probado con datos reales: "Camisa blanca cuello" (6 items sueltos, tallas
+  con duplicados) se agrupa en 1 tarjeta con S/M/L y el stock sumado
+  correctamente; "Alpargata" (10 colores × 6-7 tallas cada uno) se agrupa
+  en 10 tarjetas, una por color, con las tallas bien ordenadas
+  (35→41, no alfabético); la colección Zapatos pasa de 221 productos
+  sueltos a 57 artículos agrupados. Lint, tipos y build de producción
+  limpios.
+- **Limitación conocida, comunicada al usuario**: los productos cuya talla
+  no está al final del nombre no se agrupan con sus hermanos — es un
+  problema de cómo está escrito el nombre en Loyverse, no del código.
+
 ## 2026-09-10 — Buscador de productos
 
 - Se añade `/buscar`: busca por nombre en **todo** el catálogo (no solo

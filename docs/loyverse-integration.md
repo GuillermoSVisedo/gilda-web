@@ -48,6 +48,19 @@ online — eso sigue fuera de alcance (ver abajo).
   por lo que su tarjeta no muestra precio). Son datos a revisar directamente
   en Loyverse si se quiere corregir.
 
+## Limitaciones de Loyverse (no arreglables desde la web)
+
+- **Loyverse solo permite 1 foto por producto.** No hay forma de subir
+  varias fotos de un mismo artículo desde la web — es una limitación del
+  propio Loyverse, no de este proyecto.
+- **Loyverse no modela tallas ni colores como variantes.** No usan el
+  sistema de "opciones" de Loyverse (`option1_name` etc. están vacíos en
+  todos los productos comprobados) — cada talla de un mismo artículo está
+  cargada como un producto suelto distinto, con la talla escrita a mano al
+  final del nombre casi siempre (ej. "Vestido azul M", "Vestido azul S").
+  Ver [architecture.md](./architecture.md#agrupado-por-talla-mismo-artículo-varias-tallas)
+  para cómo se agrupan en la web a partir del nombre.
+
 ## Cómo funciona ahora mismo (resumen técnico)
 
 - `src/lib/loyverse.ts`: cliente de la API (categorías, items, inventario,

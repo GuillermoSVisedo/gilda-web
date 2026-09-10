@@ -5,7 +5,7 @@ import ProductGrid from "@/components/ProductGrid";
 import Pagination from "@/components/Pagination";
 import StockFilterToggle from "@/components/StockFilterToggle";
 import { searchProducts } from "@/lib/search";
-import { paginateProducts } from "@/lib/products";
+import { groupProductsBySize, paginateProducts } from "@/lib/products";
 
 export const metadata = { title: "Buscar | Gilda" };
 
@@ -19,7 +19,8 @@ export default async function SearchPage({
   const requestedPage = Math.max(1, Number(pageParam) || 1);
   const onlyInStock = stockParam === "1";
 
-  const allResults = query ? await searchProducts(query) : [];
+  const rawResults = query ? await searchProducts(query) : [];
+  const allResults = groupProductsBySize(rawResults);
   const results = onlyInStock
     ? allResults.filter((product) => product.inStock > 0)
     : allResults;

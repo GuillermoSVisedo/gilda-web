@@ -27,8 +27,8 @@ src/
                                corresponde cada una (ver más abajo)
   lib/
     loyverse.ts                Cliente de la API de Loyverse (fetch + paginación + tipos)
-    products.ts                  Tipo `Product` + helpers compartidos (mapeo item→Product,
-                                   paginación) usados tanto por colecciones como por búsqueda
+    products.ts                  Tipo `Product` + helpers compartidos: mapeo item→Product,
+                                   paginación, y agrupado por talla (`groupProductsBySize`)
     collections.ts              Cruza colecciones ↔ categorías/productos/stock reales de Loyverse
     search.ts                    Busca por nombre en todo el catálogo (todas las categorías)
 ```
@@ -75,6 +75,46 @@ action="/buscar" method="get">`, sin JavaScript — el envío genera
 `StockFilterToggle.tsx` se extrajeron de la página de colección para
 reutilizarlos aquí sin duplicar la lógica de "página anterior/siguiente" ni
 la del botón de stock.
+
+## Agrupado por talla (mismo artículo, varias tallas)
+
+Loyverse no modela tallas como variantes de un mismo producto: cada talla es
+un *item* suelto, con la talla escrita a mano casi siempre al final del
+nombre (`"Vestido azul M"`, `"Alpargata burdeos 36"`). `groupProductsBySize`
+en `src/lib/products.ts` agrupa esos productos sueltos en una sola tarjeta
+con una lista de tallas, aplicando esto después de obtener la lista plana de
+`Product[]` (tanto en `/coleccion/[slug]` como en `/buscar`, antes de
+paginar).
+
+**Cómo detecta la talla**: compara la última palabra del nombre contra una
+lista cerrada de tallas conocidas (`TU, XS, S, M, L, XL, XXL, XXXL, SM, ML`,
+más números de 2 cifras y `T` + número de 2 cifras para calzado). Si
+coincide, esa palabra se quita y el resto del nombre es la "clave" de
+agrupación; todos los productos que comparten esa clave se funden en una
+`GroupedProduct` con sus tallas ordenadas (`XS→XXXL`/`TU` para ropa,
+numérico ascendente para calzado).
+
+**Por qué no agrupa por color también**: el usuario pidió agrupar por talla,
+no por color — y hacerlo también por color exigiría adivinar qué palabra del
+nombre es el color (con un vocabulario mucho más abierto que el de tallas),
+arriesgando mezclar artículos que no tienen nada que ver. Comprobado con
+datos reales: "Alpargata burdeos", "Alpargata camel", "Alpargata crudo"...
+quedan como artículos separados, cada uno con sus propias tallas — correcto.
+
+**Casos que se escapan (calidad de los datos de Loyverse, no del código)**:
+
+- Si la talla no va al final del nombre (ej. `"Blusón XL granate"`, con la
+  talla en medio), ese producto no se agrupa con sus hermanos de otra talla
+  y aparece suelto. Detectado el 2026-09-10; no se ha corregido porque
+  habría que adivinar la posición de la talla dentro del nombre con mucho
+  más riesgo de falsos positivos.
+- Cuando hay productos duplicados con nombre y talla idénticos (pasa en
+  Loyverse — comprobado con "Camisa blanca cuello", con "S" repetido 3
+  veces), su stock se **suma** en la misma talla en vez de mostrarse por
+  separado.
+- La foto del grupo es la de cualquiera de sus tallas que tenga una (dado
+  que casi ningún producto tiene foto todavía, ver
+  [loyverse-integration.md](./loyverse-integration.md)).
 
 ## Colecciones curadas vs. categorías reales de Loyverse
 
@@ -160,14 +200,19 @@ JavaScript en el cliente), ahí sí tendrá sentido añadir un route handler.
   que los hrefs llevan `/` delante (`/#contacto`, no `#contacto`) — si no,
   el enlace no hace nada estando fuera de la home. Las 10 colecciones NO
   están en el header — para eso está `CollectionIndex` dentro de la home.
-- **ProductGrid.tsx**: pinta las tarjetas de producto reales (nombre, precio,
-  stock, foto). Si `product.imageUrl` existe (viene de `item.image_url` en
-  Loyverse) se muestra con `next/image` (`fill` + `object-cover`); si no,
-  bloque "Sin foto". Las fotos se sirven directamente desde
-  `api.loyverse.com/image/...` — es una URL pública (sin token), comprobado
-  con `curl` — por eso hace falta tenerla en `images.remotePatterns` de
-  `next.config.ts`. A fecha 2026-09-10 solo hay 1 producto de 1.502 con foto
-  subida; el resto se irán mostrando solas según se suban en Loyverse.
+- **ProductGrid.tsx**: recibe `GroupedProduct[]` (no `Product[]` directo) y
+  pinta nombre, precio, foto y, si `product.sizes` no es `null`, una fila de
+  pastillas — una por talla, resaltada si tiene stock y tachada/apagada si
+  está agotada (con `title` con el detalle al pasar el ratón). Si `sizes` es
+  `null` (no se detectó talla en el nombre), cae al comportamiento anterior:
+  una sola línea "En stock (N)" / "Agotado". Si `product.imageUrl` existe
+  (viene de `item.image_url` en Loyverse) se muestra con `next/image` (`fill`
+  + `object-cover`); si no, bloque "Sin foto". Las fotos se sirven
+  directamente desde `api.loyverse.com/image/...` — es una URL pública (sin
+  token), comprobado con `curl` — por eso hace falta tenerla en
+  `images.remotePatterns` de `next.config.ts`. A fecha 2026-09-10 solo hay 1
+  producto de 1.502 con foto subida; el resto se irán mostrando solas según
+  se suban en Loyverse.
 - **About.tsx / Contact.tsx**: contienen datos de ejemplo, salvo la
   dirección de `Contact.tsx` (ya es la real, obtenida de Loyverse). Listado
   completo en [content-todos.md](./content-todos.md).

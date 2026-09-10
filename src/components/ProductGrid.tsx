@@ -1,11 +1,11 @@
 import Image from "next/image";
-import type { Product } from "@/lib/collections";
+import type { GroupedProduct } from "@/lib/products";
 
 export default function ProductGrid({
   products,
   emptyMessage = "No hay productos aquí ahora mismo.",
 }: {
-  products: Product[];
+  products: GroupedProduct[];
   emptyMessage?: string;
 }) {
   if (products.length === 0) {
@@ -46,17 +46,40 @@ export default function ProductGrid({
                 {product.price.toFixed(2)} €
               </span>
             )}
-            <span
-              className={`mt-auto text-xs tracking-wide ${
-                product.inStock > 0
-                  ? "text-olive-dark"
-                  : "text-charcoal-soft/50"
-              }`}
-            >
-              {product.inStock > 0
-                ? `En stock (${product.inStock})`
-                : "Agotado"}
-            </span>
+
+            {product.sizes ? (
+              <div className="mt-auto flex flex-wrap gap-1.5 pt-1">
+                {product.sizes.map((size) => (
+                  <span
+                    key={size.label}
+                    title={
+                      size.inStock > 0
+                        ? `Talla ${size.label}: en stock (${size.inStock})`
+                        : `Talla ${size.label}: agotada`
+                    }
+                    className={`rounded-full border px-2 py-0.5 text-[11px] tracking-wide ${
+                      size.inStock > 0
+                        ? "border-olive-dark text-charcoal"
+                        : "border-line text-charcoal-soft/40 line-through"
+                    }`}
+                  >
+                    {size.label}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <span
+                className={`mt-auto text-xs tracking-wide ${
+                  product.inStock > 0
+                    ? "text-olive-dark"
+                    : "text-charcoal-soft/50"
+                }`}
+              >
+                {product.inStock > 0
+                  ? `En stock (${product.inStock})`
+                  : "Agotado"}
+              </span>
+            )}
           </div>
         </div>
       ))}

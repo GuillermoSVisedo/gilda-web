@@ -1,5 +1,5 @@
 import { getAllInventory, getAllItems } from "./loyverse";
-import { buildStockMap, sortProductsByName, toProduct } from "./products";
+import { buildStockMap, sortByName, toProduct } from "./products";
 
 // Busca en TODO el catálogo (no solo en las categorías agrupadas en las 10
 // colecciones), por coincidencia de texto en el nombre del producto. Sin
@@ -19,5 +19,5 @@ export async function searchProducts(query: string) {
     .filter((item) => item.item_name.toLowerCase().includes(normalizedQuery))
     .map((item) => toProduct(item, stockByVariant));
 
-  return sortProductsByName(matches);
+  return sortByName(matches);
 }

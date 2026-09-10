@@ -24,6 +24,10 @@ de producto, que se suben directamente en Loyverse).
 ## Datos que ya vienen de Loyverse (no son placeholder)
 
 Nombre, precio y stock de cada producto, y las 35 categorías agrupadas en 10
-colecciones. Ver [loyverse-integration.md](./loyverse-integration.md) para
-el detalle y los problemas de calidad de datos detectados (algún producto
-mal categorizado o sin precio en Loyverse).
+colecciones. Los productos se agrupan además por talla (mismo artículo,
+tallas disponibles) a partir del nombre — ver
+[architecture.md](./architecture.md#agrupado-por-talla-mismo-artículo-varias-tallas).
+Ver [loyverse-integration.md](./loyverse-integration.md) para el detalle y
+los problemas de calidad de datos detectados (algún producto mal
+categorizado, sin precio, o con la talla en medio del nombre en vez de al
+final, que por eso no se agrupa con sus hermanos).

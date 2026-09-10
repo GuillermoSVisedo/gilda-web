@@ -7,7 +7,7 @@ import Pagination from "@/components/Pagination";
 import StockFilterToggle from "@/components/StockFilterToggle";
 import { COLLECTIONS } from "@/data/collections";
 import { getCollectionProducts } from "@/lib/collections";
-import { paginateProducts } from "@/lib/products";
+import { groupProductsBySize, paginateProducts } from "@/lib/products";
 
 export function generateStaticParams() {
   return COLLECTIONS.map((collection) => ({ slug: collection.slug }));
@@ -39,9 +39,10 @@ export default async function CollectionPage({
   const onlyInStock = stockParam === "1";
 
   const allProducts = await getCollectionProducts(collection);
+  const grouped = groupProductsBySize(allProducts);
   const products = onlyInStock
-    ? allProducts.filter((product) => product.inStock > 0)
-    : allProducts;
+    ? grouped.filter((product) => product.inStock > 0)
+    : grouped;
 
   const { totalPages, currentPage, pageProducts } = paginateProducts(
     products,
