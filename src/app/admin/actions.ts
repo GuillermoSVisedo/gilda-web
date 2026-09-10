@@ -8,7 +8,11 @@ import {
   destroyAdminSession,
   isAdminAuthenticated,
 } from "@/lib/admin-auth";
-import { deleteProductPhoto, uploadProductPhoto } from "@/lib/cloudinary";
+import {
+  createUploadSignature,
+  deleteProductPhoto,
+  type UploadSignature,
+} from "@/lib/cloudinary";
 
 export async function loginAction(formData: FormData): Promise<void> {
   const password = String(formData.get("password") ?? "");
@@ -29,23 +33,24 @@ export async function logoutAction(): Promise<void> {
 // Cada Server Action verifica la sesión por su cuenta — no basta con que la
 // página que la llama esté protegida, porque una Server Action es un
 // endpoint invocable por su cuenta (recomendación oficial de Next.js).
-export async function uploadPhotoAction(
-  slug: string,
-  formData: FormData
-): Promise<void> {
+//
+// El archivo NO se sube a través de esta acción: Vercel rechaza cualquier
+// petición de más de 4,5 MB (una foto de móvil normal ya lo supera), así
+// que el navegador sube el archivo directamente a Cloudinary usando esta
+// firma — ver AdminPhotoUploader.tsx.
+export async function createUploadSignatureAction(
+  slug: string
+): Promise<UploadSignature> {
   if (!(await isAdminAuthenticated())) {
     throw new Error("No autorizado");
   }
 
-  const files = formData
-    .getAll("photos")
-    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+  return createUploadSignature(slug);
+}
 
-  for (const file of files) {
-    const arrayBuffer = await file.arrayBuffer();
-    const base64 = Buffer.from(arrayBuffer).toString("base64");
-    const dataUri = `data:${file.type};base64,${base64}`;
-    await uploadProductPhoto(slug, dataUri);
+export async function finalizeUploadAction(slug: string): Promise<void> {
+  if (!(await isAdminAuthenticated())) {
+    throw new Error("No autorizado");
   }
 
   revalidatePath(`/admin/producto/${slug}`);

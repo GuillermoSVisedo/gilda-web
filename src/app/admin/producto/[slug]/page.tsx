@@ -4,7 +4,8 @@ import { notFound, redirect } from "next/navigation";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { getGroupedProductBySlug } from "@/lib/catalog";
 import { getProductPhotos } from "@/lib/cloudinary";
-import { deletePhotoAction, uploadPhotoAction } from "../../actions";
+import AdminPhotoUploader from "@/components/AdminPhotoUploader";
+import { deletePhotoAction } from "../../actions";
 
 export async function generateMetadata({
   params,
@@ -30,7 +31,6 @@ export default async function AdminProductPage({
   if (!product) notFound();
 
   const photos = await getProductPhotos(slug);
-  const uploadWithSlug = uploadPhotoAction.bind(null, slug);
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
@@ -50,28 +50,7 @@ export default async function AdminProductPage({
           : "Sin foto en Loyverse todavía — las que subas aquí se mostrarán igualmente."}
       </p>
 
-      <form
-        action={uploadWithSlug}
-        className="mt-8 flex flex-col gap-3 rounded-2xl border border-line/70 p-5"
-      >
-        <label className="text-sm text-charcoal">
-          Añadir fotos (puedes seleccionar varias a la vez)
-        </label>
-        <input
-          type="file"
-          name="photos"
-          accept="image/*"
-          multiple
-          required
-          className="text-sm text-charcoal-soft"
-        />
-        <button
-          type="submit"
-          className="self-start rounded-full bg-olive-dark px-6 py-2 text-sm tracking-wide text-cream transition-colors hover:bg-olive-deep"
-        >
-          Subir
-        </button>
-      </form>
+      <AdminPhotoUploader slug={slug} />
 
       <h2 className="mt-10 text-sm tracking-wide text-charcoal uppercase">
         Fotos subidas ({photos.length})

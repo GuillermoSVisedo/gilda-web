@@ -4,6 +4,36 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-10 — Bug: subida de fotos rota en móvil (límite de Vercel)
+
+- El usuario reporta "This page couldn't load" en Safari (iPhone) al subir
+  una foto desde `/admin`. Causa raíz identificada por documentación, no
+  por prueba y error: Vercel rechaza cualquier petición a una función
+  serverless de más de **4,5 MB** — límite fijo de la infraestructura, no
+  configurable, igual en todos los planes (confirmado en la documentación
+  de Vercel). Además, el límite propio de Next.js para Server Actions es de
+  solo 1 MB por defecto. La subida anterior mandaba el archivo dentro del
+  body de la Server Action — cualquier foto de móvil real lo superaba.
+- Se cambia a **subida directa desde el navegador a Cloudinary** (patrón
+  recomendado por el propio Cloudinary): `createUploadSignatureAction`
+  firma la subida en el servidor (la clave secreta nunca sale de ahí) y
+  devuelve solo la firma; `AdminPhotoUploader.tsx` (nuevo Client Component)
+  hace `fetch` directo a la API de Cloudinary desde el navegador, sin pasar
+  por ningún servidor propio — así el límite de Vercel nunca entra en
+  juego. `uploadPhotoAction` (la versión antigua, que subía a través del
+  servidor) se elimina del código, ya no se usa.
+- Se valida el enfoque con una petición firmada real vía `curl` antes de
+  tocar la interfaz (confirma que Cloudinary acepta la subida firmada desde
+  fuera del SDK, tal cual la haría un navegador).
+- Probado en el navegador con un archivo de 4,12 MB generado a propósito
+  (mayor que una foto de móvil típica), inyectado en el `<input>` con
+  `DataTransfer` (los navegadores no dejan simular la selección de archivo
+  por script de forma normal): log paso a paso confirma firma → subida
+  200 OK en Cloudinary → revalidación, y la foto aparece en el panel.
+  Fotos y archivo de prueba borrados al terminar.
+- El borrado de fotos no cambia (payload pequeño, sin archivo — nunca tuvo
+  este problema).
+
 ## 2026-09-10 — Fotos adicionales de producto (Cloudinary) + panel de admin
 
 - El usuario pregunta si hay forma de tener varias fotos por producto en

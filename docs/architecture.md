@@ -161,11 +161,30 @@ de miniatura sea instantáneo, no justifica un salto de página.
 (`ADMIN_PASSWORD`), sin sistema de usuarios — no hace falta más para una
 sola persona gestionando la tienda. `lib/admin-auth.ts` guarda en una cookie
 `httpOnly` un hash SHA-256 de la contraseña (no la contraseña en claro), y
-cada Server Action que muta datos (`uploadPhotoAction`, `deletePhotoAction`)
-vuelve a comprobar la sesión por su cuenta — no basta con que la página que
-las llama esté protegida, porque una Server Action es un endpoint invocable
-por separado (así lo advierte la propia documentación de Next.js sobre
-Server Actions).
+cada Server Action que muta datos (`createUploadSignatureAction`,
+`finalizeUploadAction`, `deletePhotoAction`) vuelve a comprobar la sesión
+por su cuenta — no basta con que la página que las llama esté protegida,
+porque una Server Action es un endpoint invocable por separado (así lo
+advierte la propia documentación de Next.js sobre Server Actions).
+
+**La subida no pasa por nuestro servidor**: la primera versión sí lo hacía
+(el archivo iba dentro del body de una Server Action) y se rompía con fotos
+de móvil reales — Vercel rechaza cualquier petición a una función serverless
+de más de **4,5 MB**, es un límite fijo de la infraestructura, no
+configurable (ni con `serverActions.bodySizeLimit` de Next.js, que además
+por defecto es solo 1 MB). Comprobado en producción: una foto de iPhone
+real daba "This page couldn't load" en Safari.
+
+La solución (patrón recomendado por el propio Cloudinary para subidas desde
+el navegador): `createUploadSignatureAction` firma la subida en el servidor
+(con `CLOUDINARY_API_SECRET`, que nunca sale de ahí) y devuelve solo la
+firma — un payload minúsculo. `AdminPhotoUploader.tsx` (Client Component)
+usa esa firma para hacer `fetch` **directamente desde el navegador** a
+`api.cloudinary.com/v1_1/.../image/upload`, sin pasar por ningún servidor
+propio. Probado con un archivo de prueba de 4,12 MB (mayor que la mayoría de
+fotos de móvil): sube sin problema porque el límite de Vercel nunca entra en
+juego. Al terminar, se llama a `finalizeUploadAction` (payload pequeño, sin
+archivo) para revalidar las páginas afectadas.
 
 `/admin` reutiliza `searchProducts` + `groupProductsBySize` (el mismo motor
 que `/buscar`) para localizar el producto al que añadir fotos — sin
