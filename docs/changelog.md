@@ -4,6 +4,27 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-10 — Fotos de producto (soporte añadido, casi sin fotos aún)
+
+- El usuario pide comprobar si ya hay fotos subidas en Loyverse. Consulta
+  directa a la API: de 1.502 productos, **solo 1 tiene foto**
+  ("Camisa abullonada rayas naranja M"). Se verifica que la URL de imagen
+  (`api.loyverse.com/image/...`) es pública (200 con y sin token) y es una
+  foto real (453KB, no un placeholder).
+- Se añade soporte para mostrar la foto cuando exista: `Product.imageUrl`
+  en `lib/collections.ts` (desde `item.image_url`), `ProductGrid.tsx` usa
+  `next/image` con `fill`/`object-cover` cuando hay foto y sigue mostrando
+  "Sin foto" cuando no la hay.
+- Hace falta añadir `api.loyverse.com` a `images.remotePatterns` en
+  `next.config.ts` (Next.js bloquea con 400 cualquier dominio externo no
+  declarado ahí al usar `next/image`).
+- Verificado en el navegador (encontrada la página exacta del producto con
+  foto vía `curl` en un bucle, para no navegar a mano entre cientos de
+  productos): la foto se recorta y encaja bien en la tarjeta; el resto de
+  productos sin foto no se ven afectados. Build de producción limpio.
+- No hace falta ningún cambio más cuando se suban más fotos en Loyverse —
+  aparecerán solas.
+
 ## 2026-09-08 — Bug: la nav del header no funcionaba fuera de la home
 
 - El usuario reporta que, estando en una colección (ej.

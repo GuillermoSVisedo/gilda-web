@@ -6,6 +6,7 @@ export type Product = {
   name: string;
   price: number | null;
   inStock: number;
+  imageUrl: string | null;
 };
 
 function normalize(name: string): string {
@@ -53,6 +54,7 @@ export async function getCollectionProducts(
         name: item.item_name,
         price: prices.length > 0 ? Math.min(...prices) : null,
         inStock,
+        imageUrl: item.image_url,
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name, "es"));

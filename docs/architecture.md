@@ -138,9 +138,13 @@ sí tendrá sentido añadir un route handler.
   el enlace no hace nada estando fuera de la home. Las 10 colecciones NO
   están en el header — para eso está `CollectionIndex` dentro de la home.
 - **ProductGrid.tsx**: pinta las tarjetas de producto reales (nombre, precio,
-  stock). Ningún producto tiene foto subida en Loyverse todavía, así que cada
-  tarjeta lleva un bloque "Sin foto" — sustituir por `next/image` en cuanto
-  haya fotos.
+  stock, foto). Si `product.imageUrl` existe (viene de `item.image_url` en
+  Loyverse) se muestra con `next/image` (`fill` + `object-cover`); si no,
+  bloque "Sin foto". Las fotos se sirven directamente desde
+  `api.loyverse.com/image/...` — es una URL pública (sin token), comprobado
+  con `curl` — por eso hace falta tenerla en `images.remotePatterns` de
+  `next.config.ts`. A fecha 2026-09-10 solo hay 1 producto de 1.502 con foto
+  subida; el resto se irán mostrando solas según se suban en Loyverse.
 - **About.tsx / Contact.tsx**: contienen datos de ejemplo, salvo la
   dirección de `Contact.tsx` (ya es la real, obtenida de Loyverse). Listado
   completo en [content-todos.md](./content-todos.md).
