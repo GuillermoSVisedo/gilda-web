@@ -9,12 +9,16 @@ src/
     coleccion/[slug]/
       page.tsx              Página de una colección: productos reales + paginación
       error.tsx              Fallback en marca si falla la llamada a Loyverse
+    buscar/
+      page.tsx              Buscador: resultados por nombre en TODO el catálogo
   components/
-    Header.tsx             Cabecera sticky: logo, navegación, CTA de WhatsApp
+    Header.tsx             Cabecera sticky: logo, navegación, icono de buscar, CTA de WhatsApp
     Hero.tsx                Sección de portada (#inicio)
     About.tsx                Sección "sobre Gilda" (#sobre-gilda)
     CollectionIndex.tsx      Índice de las 10 colecciones, enlaza a /coleccion/[slug] (#colecciones)
-    ProductGrid.tsx           Grid de tarjetas de producto (usado en la página de colección)
+    ProductGrid.tsx           Grid de tarjetas de producto (colección y búsqueda)
+    Pagination.tsx             Paginación genérica (recibe un buildHref)
+    StockFilterToggle.tsx      Botón "Solo en stock" genérico (colección y búsqueda)
     ComingSoon.tsx           Banner "cómo comprar ahora mismo"
     Contact.tsx               Dirección, horario, contacto, redes (#contacto)
     Footer.tsx                Pie de página
@@ -23,7 +27,10 @@ src/
                                corresponde cada una (ver más abajo)
   lib/
     loyverse.ts                Cliente de la API de Loyverse (fetch + paginación + tipos)
+    products.ts                  Tipo `Product` + helpers compartidos (mapeo item→Product,
+                                   paginación) usados tanto por colecciones como por búsqueda
     collections.ts              Cruza colecciones ↔ categorías/productos/stock reales de Loyverse
+    search.ts                    Busca por nombre en todo el catálogo (todas las categorías)
 ```
 
 ## Flujo de páginas
@@ -53,6 +60,21 @@ perder el filtro al cambiar de página.
 Se eligió **una página por colección** (en vez de todo en una sola página
 larga) porque el catálogo real tiene más de 1.500 productos — comprobado el
 2026-09-08 vía API. Ver [loyverse-integration.md](./loyverse-integration.md).
+
+**Buscador (`/buscar`)**: mismo patrón que la colección (server-rendered,
+paginado, filtro de stock), pero en vez de filtrar por categoría busca por
+coincidencia de texto en `item_name` sobre **todos** los productos
+(`lib/search.ts` → `searchProducts`), sin importar a qué categoría
+pertenezcan. Es intencional: sirve para encontrar directamente un producto
+por nombre sin tener que saber en qué colección está.
+
+El formulario de búsqueda del header (`Header.tsx`) es un icono que enlaza a
+`/buscar`; el input real vive en la propia página `/buscar` (`<form
+action="/buscar" method="get">`, sin JavaScript — el envío genera
+`/buscar?q=...` como cualquier formulario HTML). `Pagination.tsx` y
+`StockFilterToggle.tsx` se extrajeron de la página de colección para
+reutilizarlos aquí sin duplicar la lógica de "página anterior/siguiente" ni
+la del botón de stock.
 
 ## Colecciones curadas vs. categorías reales de Loyverse
 
@@ -108,12 +130,13 @@ productos reales.
 ## Por qué no hay una API route de por medio
 
 La lectura de datos de Loyverse ocurre directamente en Server Components
-(`src/app/coleccion/[slug]/page.tsx`), no a través de un route handler
-propio (`/api/loyverse/...`). Motivo: no hay ninguna interacción del lado
-cliente todavía (no hay buscador ni filtros con JS) — con Server Components
+(`src/app/coleccion/[slug]/page.tsx`, `src/app/buscar/page.tsx`), no a
+través de un route handler propio (`/api/loyverse/...`). Motivo: toda
+interacción (paginar, filtrar por stock, buscar) es una navegación HTML
+normal vía `searchParams`, sin JavaScript de cliente — con Server Components
 el token de Loyverse nunca sale del servidor y no hace falta una capa extra.
-Si más adelante se necesita filtrar/buscar con JavaScript en el cliente, ahí
-sí tendrá sentido añadir un route handler.
+Si en el futuro se necesita autocompletado en vivo mientras se escribe (con
+JavaScript en el cliente), ahí sí tendrá sentido añadir un route handler.
 
 ## Caché y paginación contra la API de Loyverse
 

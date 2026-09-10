@@ -1,12 +1,16 @@
 import Image from "next/image";
 import type { Product } from "@/lib/collections";
 
-export default function ProductGrid({ products }: { products: Product[] }) {
+export default function ProductGrid({
+  products,
+  emptyMessage = "No hay productos aquí ahora mismo.",
+}: {
+  products: Product[];
+  emptyMessage?: string;
+}) {
   if (products.length === 0) {
     return (
-      <p className="mt-14 text-center text-charcoal-soft">
-        No hay productos en esta colección ahora mismo.
-      </p>
+      <p className="mt-14 text-center text-charcoal-soft">{emptyMessage}</p>
     );
   }
 

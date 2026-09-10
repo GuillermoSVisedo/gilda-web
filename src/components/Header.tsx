@@ -34,14 +34,36 @@ export default function Header() {
           ))}
         </nav>
 
-        <a
-          href={WHATSAPP_LINK}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-full bg-olive-dark px-5 py-2 text-sm tracking-wide text-cream transition-colors hover:bg-olive-deep"
-        >
-          Escríbenos
-        </a>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/buscar"
+            aria-label="Buscar producto"
+            className="p-2 text-charcoal-soft transition-colors hover:text-olive-dark"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="size-5"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </Link>
+
+          <a
+            href={WHATSAPP_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-full bg-olive-dark px-5 py-2 text-sm tracking-wide text-cream transition-colors hover:bg-olive-deep"
+          >
+            Escríbenos
+          </a>
+        </div>
       </div>
     </header>
   );

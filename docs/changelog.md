@@ -4,6 +4,29 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-10 — Buscador de productos
+
+- Se añade `/buscar`: busca por nombre en **todo** el catálogo (no solo
+  dentro de una colección), para ir directo a un producto sin tener que
+  saber en qué categoría está. Mismo patrón sin JavaScript que el resto del
+  sitio: `<form method="get" action="/buscar">`, resultados vía
+  `searchParams`, paginados (24/página) y con el filtro "Solo en stock".
+- Icono de lupa en `Header.tsx` (visible en todas las páginas) que enlaza a
+  `/buscar` — el input real vive en la propia página de búsqueda.
+- Refactor antes de duplicar código: se extrae `src/lib/products.ts` (tipo
+  `Product`, `toProduct`, `buildStockMap`, `paginateProducts`) usado tanto
+  por `lib/collections.ts` (búsqueda por categoría) como por el nuevo
+  `lib/search.ts` (búsqueda por nombre). También se extraen
+  `Pagination.tsx` y `StockFilterToggle.tsx` de la página de colección para
+  reutilizarlos en `/buscar` sin copiar la lógica de paginación ni la del
+  botón de stock.
+- `ProductGrid` gana un `emptyMessage` configurable (antes decía "no hay
+  productos en esta colección" incluso en resultados de búsqueda vacíos).
+- Probado: "vestido" → 220 resultados (no 221 como la colección Vestidos,
+  porque aquí se busca por nombre en todo el catálogo, no por categoría —
+  comportamiento distinto y esperado); combinación `?q=vestido&stock=1&page=2`
+  funciona correctamente. Lint, tipos y build de producción limpios.
+
 ## 2026-09-10 — Fotos de producto (soporte añadido, casi sin fotos aún)
 
 - El usuario pide comprobar si ya hay fotos subidas en Loyverse. Consulta
