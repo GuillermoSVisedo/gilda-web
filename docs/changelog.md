@@ -4,6 +4,14 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-10 — "TU" se muestra como "Talla única"
+
+- Ajuste pequeño: la pastilla de talla mostraba literalmente "TU" (la
+  abreviatura que se usa en los nombres de Loyverse). Se añade
+  `formatSizeLabel` en `lib/products.ts` que muestra "Talla única" en su
+  lugar, tanto en la pastilla como en el tooltip. El resto de tallas no
+  cambian.
+
 ## 2026-09-10 — Agrupado por talla (mismo artículo, varias tallas)
 
 - El usuario reporta que Loyverse solo permite 1 foto por producto (no es

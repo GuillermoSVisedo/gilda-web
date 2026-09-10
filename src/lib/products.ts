@@ -125,6 +125,12 @@ function compareSizes(a: string, b: string): number {
   return a.localeCompare(b);
 }
 
+// "TU" (talla única) se lee mal como pastilla de talla — se muestra en
+// texto completo en vez de la abreviatura.
+export function formatSizeLabel(label: string): string {
+  return label === "TU" ? "Talla única" : label;
+}
+
 export type SizeOption = {
   label: string;
   inStock: number;

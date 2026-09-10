@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { GroupedProduct } from "@/lib/products";
+import { formatSizeLabel, type GroupedProduct } from "@/lib/products";
 
 export default function ProductGrid({
   products,
@@ -54,8 +54,8 @@ export default function ProductGrid({
                     key={size.label}
                     title={
                       size.inStock > 0
-                        ? `Talla ${size.label}: en stock (${size.inStock})`
-                        : `Talla ${size.label}: agotada`
+                        ? `${formatSizeLabel(size.label)}: en stock (${size.inStock})`
+                        : `${formatSizeLabel(size.label)}: agotada`
                     }
                     className={`rounded-full border px-2 py-0.5 text-[11px] tracking-wide ${
                       size.inStock > 0
@@ -63,7 +63,7 @@ export default function ProductGrid({
                         : "border-line text-charcoal-soft/40 line-through"
                     }`}
                   >
-                    {size.label}
+                    {formatSizeLabel(size.label)}
                   </span>
                 ))}
               </div>
