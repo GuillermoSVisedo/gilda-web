@@ -15,7 +15,14 @@ export default function AdminPhotoUploader({ slug }: { slug: string }) {
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (files.length === 0) return;
+
+    // El botón nunca está desactivado (para que no parezca "roto" sin
+    // explicación) — si no hay fotos elegidas, se avisa aquí con un
+    // mensaje claro en vez de no hacer nada.
+    if (files.length === 0) {
+      setError("Elige al menos una foto antes de subir.");
+      return;
+    }
 
     setUploading(true);
     setError(null);
@@ -68,17 +75,27 @@ export default function AdminPhotoUploader({ slug }: { slug: string }) {
         type="file"
         accept="image/*"
         multiple
-        onChange={(event) =>
-          setFiles(Array.from(event.target.files ?? []))
-        }
-        className="text-sm text-charcoal-soft"
+        onChange={(event) => {
+          setFiles(Array.from(event.target.files ?? []));
+          setError(null);
+        }}
+        className="text-sm text-charcoal-soft file:mr-3 file:rounded-full file:border-0 file:bg-olive-dark file:px-4 file:py-2 file:text-sm file:font-medium file:tracking-wide file:text-cream file:transition-colors hover:file:bg-olive-deep"
       />
+
+      {files.length > 0 && (
+        <p className="text-sm text-olive-dark">
+          {files.length === 1
+            ? "1 foto elegida: "
+            : `${files.length} fotos elegidas: `}
+          {files.map((file) => file.name).join(", ")}
+        </p>
+      )}
 
       {error && <p className="text-sm text-red-700">{error}</p>}
 
       <button
         type="submit"
-        disabled={files.length === 0 || uploading}
+        disabled={uploading}
         className="self-start rounded-full bg-olive-dark px-6 py-2 text-sm tracking-wide text-cream transition-colors hover:bg-olive-deep disabled:cursor-not-allowed disabled:opacity-50"
       >
         {uploading

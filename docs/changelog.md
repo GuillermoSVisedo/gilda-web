@@ -4,6 +4,27 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-10 — Mejoras de UX en el panel: botón "Subir" y selector de archivos
+
+- El usuario reporta que el botón "Subir" del panel aparece deshabilitado.
+  No se pudo reproducir un fallo real (probado a fondo: al elegir una foto
+  el botón sí se activa correctamente), pero era ambiguo por qué aparecía
+  gris — así que se cambia el comportamiento para que nunca quede
+  bloqueado sin explicación: ahora siempre es pulsable, y si no hay
+  ninguna foto elegida, al pulsarlo aparece el mensaje "Elige al menos una
+  foto antes de subir." en vez de no hacer nada.
+- Se añade texto de confirmación visible tras elegir archivo(s) — "1 foto
+  elegida: nombre.jpg" — para que quede claro que la selección se ha
+  registrado.
+- El usuario pide además que el texto "Elegir archivos" del selector
+  nativo se remarque para que se note dónde hay que tocar. Se estiliza con
+  las clases `file:*` de Tailwind (pseudo-elemento `::file-selector-button`)
+  para que se vea como un botón real en verde oliva de marca, en vez del
+  texto plano por defecto del navegador.
+- Verificado en navegador: sin foto elegida → mensaje de error claro; con
+  foto elegida → nombre visible y botón "Subir (1)". Build de producción
+  limpio.
+
 ## 2026-09-10 — Bug: subida de fotos rota en móvil (límite de Vercel)
 
 - El usuario reporta "This page couldn't load" en Safari (iPhone) al subir
