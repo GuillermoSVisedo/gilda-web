@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { formatSizeLabel, type GroupedProduct } from "@/lib/products";
 
 export default function ProductGrid({
@@ -17,9 +18,10 @@ export default function ProductGrid({
   return (
     <div className="mt-10 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
       {products.map((product) => (
-        <div
+        <Link
           key={product.id}
-          className="flex flex-col overflow-hidden rounded-2xl border border-line/70 bg-white/60"
+          href={`/producto/${product.slug}`}
+          className="flex flex-col overflow-hidden rounded-2xl border border-line/70 bg-white/60 transition-colors hover:border-olive-dark"
         >
           {product.imageUrl ? (
             <div className="relative aspect-3/4 border-b border-line/70 bg-olive/20">
@@ -81,7 +83,7 @@ export default function ProductGrid({
               </span>
             )}
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );

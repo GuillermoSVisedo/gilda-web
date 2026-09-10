@@ -11,12 +11,22 @@ src/
       error.tsx              Fallback en marca si falla la llamada a Loyverse
     buscar/
       page.tsx              Buscador: resultados por nombre en TODO el catálogo
+    producto/[slug]/
+      page.tsx              Página pública de un producto: galería de fotos + tallas
+    admin/
+      login/page.tsx        Login del panel privado (contraseña única)
+      page.tsx                Panel: busca un producto (mismo motor que /buscar)
+      producto/[slug]/page.tsx  Gestor de fotos de ese producto (subir/eliminar)
+      actions.ts               Server Actions: login, logout, subir foto, eliminar foto
   components/
     Header.tsx             Cabecera sticky: logo, navegación, icono de buscar, CTA de WhatsApp
     Hero.tsx                Sección de portada (#inicio)
     About.tsx                Sección "sobre Gilda" (#sobre-gilda)
     CollectionIndex.tsx      Índice de las 10 colecciones, enlaza a /coleccion/[slug] (#colecciones)
-    ProductGrid.tsx           Grid de tarjetas de producto (colección y búsqueda)
+    ProductGrid.tsx           Grid de tarjetas de producto (colección y búsqueda), cada una
+                               enlaza a /producto/[slug]
+    ProductGallery.tsx         Galería de fotos del producto (Client Component: cambia la foto
+                                 principal al hacer clic en una miniatura)
     Pagination.tsx             Paginación genérica (recibe un buildHref)
     StockFilterToggle.tsx      Botón "Solo en stock" genérico (colección y búsqueda)
     ComingSoon.tsx           Banner "cómo comprar ahora mismo"
@@ -27,10 +37,14 @@ src/
                                corresponde cada una (ver más abajo)
   lib/
     loyverse.ts                Cliente de la API de Loyverse (fetch + paginación + tipos)
-    products.ts                  Tipo `Product` + helpers compartidos: mapeo item→Product,
-                                   paginación, y agrupado por talla (`groupProductsBySize`)
+    products.ts                  Tipo `Product`/`GroupedProduct` + helpers compartidos: mapeo
+                                   item→Product, paginación, agrupado por talla, `slugify`
     collections.ts              Cruza colecciones ↔ categorías/productos/stock reales de Loyverse
     search.ts                    Busca por nombre en todo el catálogo (todas las categorías)
+    catalog.ts                   Catálogo completo sin filtrar — resuelve un artículo por su
+                                   slug (usado por /producto y el panel de admin)
+    cloudinary.ts                Fotos adicionales de producto (subir/listar/borrar en Cloudinary)
+    admin-auth.ts                Sesión del panel privado (cookie firmada con hash de la contraseña)
 ```
 
 ## Flujo de páginas
@@ -115,6 +129,52 @@ quedan como artículos separados, cada uno con sus propias tallas — correcto.
 - La foto del grupo es la de cualquiera de sus tallas que tenga una (dado
   que casi ningún producto tiene foto todavía, ver
   [loyverse-integration.md](./loyverse-integration.md)).
+
+## Fotos adicionales de producto y panel de admin
+
+Loyverse solo admite 1 foto por producto (comprobado por API y en su
+documentación oficial — no es un límite de plan). Para tener varias fotos
+por artículo se añadió **Cloudinary** como almacenamiento externo, más un
+panel privado (`/admin`) para subirlas sin tocar código ni depender de
+Loyverse.
+
+**Cómo se relaciona una foto con su producto**: cada foto se sube a
+Cloudinary etiquetada con `producto-<slug>`, donde `slug` es
+`slugify(nombre base)` (mismo `slug` que ya lleva cada `GroupedProduct` —
+ver "Agrupado por talla" más abajo). No hay base de datos propia: Cloudinary
+hace de índice. `lib/cloudinary.ts` usa la **Admin API**
+(`cloudinary.api.resources_by_tag`), no la Search API — se comprobó
+manualmente que la Search API tiene retraso de indexación (una foto recién
+subida no aparecía en la búsqueda durante unos segundos), mientras que
+`resources_by_tag` refleja subidas y borrados al instante.
+
+**Página pública de producto** (`/producto/[slug]`): antes las tarjetas del
+catálogo no llevaban a ningún sitio; ahora cada una enlaza aquí.
+`getGroupedProductBySlug` (en `lib/catalog.ts`) agrupa el catálogo completo
+(sin filtrar por colección ni búsqueda) y busca el artículo cuyo slug
+coincide. La galería combina la foto de Loyverse (si existe) más las fotos
+de Cloudinary, y `ProductGallery.tsx` es el único Client Component del sitio
+por ahora — hace falta estado en el cliente (foto activa) para que cambiar
+de miniatura sea instantáneo, no justifica un salto de página.
+
+**Panel de admin** (`/admin`): protegido con una única contraseña
+(`ADMIN_PASSWORD`), sin sistema de usuarios — no hace falta más para una
+sola persona gestionando la tienda. `lib/admin-auth.ts` guarda en una cookie
+`httpOnly` un hash SHA-256 de la contraseña (no la contraseña en claro), y
+cada Server Action que muta datos (`uploadPhotoAction`, `deletePhotoAction`)
+vuelve a comprobar la sesión por su cuenta — no basta con que la página que
+las llama esté protegida, porque una Server Action es un endpoint invocable
+por separado (así lo advierte la propia documentación de Next.js sobre
+Server Actions).
+
+`/admin` reutiliza `searchProducts` + `groupProductsBySize` (el mismo motor
+que `/buscar`) para localizar el producto al que añadir fotos — sin
+duplicar lógica de búsqueda.
+
+**Limitación conocida del panel**: solo hay una contraseña compartida, sin
+registro de quién sube o borra qué. Suficiente para el uso actual (una
+persona); si en el futuro hay varias personas gestionando fotos, convendría
+un sistema de usuarios real.
 
 ## Colecciones curadas vs. categorías reales de Loyverse
 

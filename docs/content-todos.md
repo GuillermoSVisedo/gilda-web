@@ -15,7 +15,7 @@ exactamente (`grep -rn "TODO" src/`).
 | Instagram | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: instagram.com/gildanavacerrada |
 | Mapa de la tienda | [`Contact.tsx`](../src/components/Contact.tsx) | ✅ Real: iframe de Google Maps con la dirección real (sin API key) |
 | Favicon / logo real | `src/app/favicon.ico`, `public/` | Icono por defecto de Next.js |
-| **Fotos de producto** | [`ProductGrid.tsx`](../src/components/ProductGrid.tsx) | 🟡 Ya soportado: si el producto tiene `image_url` en Loyverse se muestra automáticamente (comprobado el 2026-09-10 con la única foto subida hasta ahora). El resto sigue mostrando "Sin foto" — se van mostrando solas a medida que se suban fotos en Loyverse, no requiere ningún cambio aquí. |
+| **Fotos de producto** | [`ProductGrid.tsx`](../src/components/ProductGrid.tsx), panel `/admin` | ✅ Soportado por dos vías: 1) la foto de Loyverse (`image_url`) se muestra sola si existe; 2) fotos adicionales (varias por artículo) se suben desde `/admin` (contraseña en `ADMIN_PASSWORD`), buscando el producto y arrastrando imágenes — se guardan en Cloudinary y aparecen solas en `/producto/[slug]`. La mayoría de productos siguen sin ninguna foto todavía; hay que ir subiéndolas desde el panel. |
 
 Cuando se disponga de estos datos reales, avisar para sustituirlos — no
 requiere cambios de estructura, solo edición de contenido (excepto las fotos

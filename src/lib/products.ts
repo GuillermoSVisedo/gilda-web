@@ -131,6 +131,19 @@ export function formatSizeLabel(label: string): string {
   return label === "TU" ? "Talla única" : label;
 }
 
+// Identificador estable para la URL del producto (/producto/[slug]) y para
+// las etiquetas de sus fotos en Cloudinary. Es una función pura del nombre
+// base, así que da el mismo resultado se agrupe donde se agrupe (colección,
+// búsqueda, panel de admin) sin necesidad de coordinarlo en un sitio único.
+export function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "") // quita acentos
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-+|-+$)/g, "");
+}
+
 export type SizeOption = {
   label: string;
   inStock: number;
@@ -138,6 +151,7 @@ export type SizeOption = {
 
 export type GroupedProduct = {
   id: string;
+  slug: string;
   name: string;
   imageUrl: string | null;
   price: number | null;
@@ -180,6 +194,7 @@ export function groupProductsBySize(products: Product[]): GroupedProduct[] {
 
     result.push({
       id: group.items[0].id,
+      slug: slugify(base),
       name: base,
       imageUrl: group.items.find((item) => item.imageUrl)?.imageUrl ?? null,
       price: prices.length > 0 ? Math.min(...prices) : null,

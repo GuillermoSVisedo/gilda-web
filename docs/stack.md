@@ -9,6 +9,9 @@
 - **ESLint** (config de `eslint-config-next`).
 - Fuentes: `next/font/google` — Cormorant Garamond (serif, títulos) + Inter
   (sans, texto). Ver [design-system.md](./design-system.md).
+- **Cloudinary** (SDK oficial `cloudinary`) — almacena las fotos de producto
+  adicionales a la única que permite Loyverse. Ver
+  [architecture.md](./architecture.md#fotos-adicionales-de-producto-y-panel-de-admin).
 
 No hay base de datos propia. El "backend" es la API de Loyverse, consultada
 desde Server Components — ver [loyverse-integration.md](./loyverse-integration.md).
@@ -47,8 +50,10 @@ npm run build    # build de producción (incluye chequeo de tipos)
   desplegado en Vercel desde la rama `main` — cada `git push` a `main`
   despliega automáticamente.
 - **Repositorio**: [github.com/GuillermoSVisedo/gilda-web](https://github.com/GuillermoSVisedo/gilda-web).
-- La variable `LOYVERSE_API_TOKEN` está configurada directamente en Vercel
-  (Project Settings → Environment Variables), no solo en `.env.local`.
+- Todas las variables de entorno (`LOYVERSE_API_TOKEN`,
+  `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`,
+  `ADMIN_PASSWORD`) están configuradas directamente en Vercel (Project
+  Settings → Environment Variables), no solo en `.env.local`.
 - Para desplegar cambios: hacer commit y `git push origin main`. No hace
   falta ningún paso manual adicional en Vercel.
 - Dominio propio: pendiente (por ahora se usa el subdominio gratuito de
@@ -59,6 +64,12 @@ npm run build    # build de producción (incluye chequeo de tipos)
 - `LOYVERSE_API_TOKEN` — token de acceso a la API de Loyverse, usado por
   `src/lib/loyverse.ts`. Ver plantilla en [`.env.example`](../.env.example)
   y detalle en [loyverse-integration.md](./loyverse-integration.md).
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` —
+  credenciales de la cuenta de Cloudinary (gratis) donde se guardan las
+  fotos de producto adicionales, usadas por `src/lib/cloudinary.ts`.
+- `ADMIN_PASSWORD` — contraseña del panel privado `/admin`, usada por
+  `src/lib/admin-auth.ts`. Solo hay una, compartida — sin usuarios
+  individuales (ver [architecture.md](./architecture.md#fotos-adicionales-de-producto-y-panel-de-admin)).
 
 Va en `.env.local` (ya excluido en `.gitignore`), nunca en el repositorio.
 Idealmente tampoco se pega en el chat — en la práctica, la primera vez se

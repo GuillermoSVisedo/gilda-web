@@ -4,6 +4,58 @@ Log cronológico de decisiones y trabajo realizado. El objetivo es que se
 pueda seguir el hilo de *por qué* está cada cosa sin tener que adivinarlo por
 el código o por el historial de git.
 
+## 2026-09-10 — Fotos adicionales de producto (Cloudinary) + panel de admin
+
+- El usuario pregunta si hay forma de tener varias fotos por producto en
+  Loyverse. Se investiga a fondo antes de responder: la API solo tiene un
+  campo `image_url` por producto (ni las variantes tienen foto propia) y la
+  documentación oficial de Loyverse (`support.loyverse.com`) solo describe
+  subir 1 imagen — no es un límite de plan, es así siempre.
+- Se plantean dos opciones (subir directamente a un panel externo tipo
+  Cloudinary, o construir un panel propio en la web) y el usuario elige
+  construir un panel propio. Se le pide crear una cuenta de Cloudinary
+  (gratis, 25 GB/mes) y elegir una contraseña para el panel — mismo patrón
+  que con Loyverse: el usuario comparte las credenciales directamente
+  (captura del dashboard de Cloudinary + contraseña en texto) para que se
+  guarden en `.env.local`. Se avisa de que la contraseña dada
+  (`07051994`, con pinta de fecha) es fácil de adivinar.
+- **Arquitectura**: sin base de datos propia. Cada foto se sube a
+  Cloudinary etiquetada `producto-<slug>` (mismo `slug` que ya llevan los
+  `GroupedProduct`, vía la nueva función `slugify` en `lib/products.ts`).
+  `lib/cloudinary.ts` usa la Admin API (`resources_by_tag`), no la Search
+  API — probado a mano que la Search API tarda unos segundos en indexar
+  una foto recién subida, mientras que `resources_by_tag` es instantánea.
+- Se crea `lib/catalog.ts` (`getGroupedProductBySlug`) para resolver
+  cualquier artículo por su slug sin depender de en qué colección o
+  búsqueda se generó — necesario tanto para la página pública de producto
+  como para el panel.
+- Nueva página pública `/producto/[slug]`: galería (foto de Loyverse +
+  fotos de Cloudinary) con `ProductGallery.tsx` (primer Client Component
+  del sitio — hace falta estado en cliente para cambiar de miniatura sin
+  recargar). Las tarjetas de `ProductGrid` ahora enlazan aquí (antes no
+  llevaban a ningún sitio).
+- Nuevo panel `/admin`: login con contraseña única (`lib/admin-auth.ts`,
+  cookie `httpOnly` con un hash SHA-256 de la contraseña, nunca la
+  contraseña en claro), buscador de productos (reutiliza `searchProducts` +
+  `groupProductsBySize`, el mismo motor que `/buscar`), y gestor de fotos
+  por producto (subir varias a la vez, eliminar una a una). Cada Server
+  Action que muta datos vuelve a comprobar la sesión por su cuenta, no solo
+  la página — siguiendo la recomendación explícita de la documentación de
+  Next.js sobre Server Actions.
+- **Verificación de extremo a extremo, con retos reales**: el panel del
+  navegador no ofrece una forma directa de simular la selección de un
+  archivo en un `<input type="file">` (es una restricción de seguridad de
+  los navegadores). Se resolvió inyectando un `File` vía
+  `DataTransfer`/`input.files` y disparando `form.requestSubmit()` con
+  JavaScript — confirmado con las credenciales reales de Cloudinary: login,
+  búsqueda, subida (2 fotos), visualización en `/admin` y en la página
+  pública con las dos miniaturas cargando, eliminado de ambas fotos, y
+  logout. Todo verificado contra los logs del servidor (cada Server Action
+  quedó registrada) y no solo la interfaz. Build de producción limpio con
+  las 8 rutas nuevas.
+- Fotos de prueba borradas de Cloudinary al terminar — no queda nada de
+  prueba en la cuenta real.
+
 ## 2026-09-10 — "TU" se muestra como "Talla única"
 
 - Ajuste pequeño: la pastilla de talla mostraba literalmente "TU" (la
